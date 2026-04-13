@@ -1,3 +1,11 @@
+<?php
+require_once __DIR__ . '/includes/db_connect.php';
+
+$all_products = get_all_products($pdo);
+$categories = get_categories($pdo);
+$star_product = get_star_product($pdo);
+$featured_products = get_featured_products($pdo);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -396,7 +404,7 @@
               <input type="tel" id="phone" class="form-control" placeholder="+91" required>
               <label for="address">Shipping Address</label>
               <textarea id="address" class="form-control" rows="3" required></textarea>
-              <button type="submit" class="btn-terra w-100 mt-3">Place Order via WhatsApp</button>
+              <button type="submit" class="btn-terra w-100 mt-3">Place Order</button>
             </form>
           </div>
           <div class="col-md-5">
@@ -447,35 +455,28 @@
   <div class="hero-left">
     <div class="hero-counter"><strong id="slideNum">01</strong> / 03</div>
 
-    <!-- Slide 1 : Coconut Oil Kerala -->
-    <div class="hero-slide-left active" data-slide="0" data-id="7" data-name="Kerala Coconut Oil" data-price="250" data-img="https://sevendaysenterprises.com/images/coconut-oil-kerala.png">
-      <h1 class="hero-title">Pure from the<br>heart of<br><em>Kerala Coconut</em></h1>
-      <p class="hero-sub">Cold-pressed from the finest Kerala coconuts — rich in natural goodness, with a deep aroma that takes you straight to the source.</p>
+    <?php
+    $hero_slides = [
+        ['title' => 'Pure from the<br>heart of<br><em>Kerala Coconut</em>', 'sub' => 'Cold-pressed from the finest Kerala coconuts — rich in natural goodness, with a deep aroma that takes you straight to the source.', 'product' => 'Kerala Coconut Oil'],
+        ['title' => 'Warm your<br>soul with<br><em>Chukku Kaappi</em>', 'sub' => 'Traditional dry-ginger coffee — rich, soothing and deeply aromatic. A comforting cup that nourishes from the inside out.', 'product' => 'Chukku Kaappi'],
+        ['title' => 'Power your<br>mornings with<br><em>Millet Idli Podi</em>', 'sub' => 'Nutritious millet flours meet bold aromatic spices — protein-rich, wholesome and utterly delicious with every crispy idli.', 'product' => 'Millet Idli Podi']
+    ];
+    foreach ($hero_slides as $index => $slide):
+        $product = array_values(array_filter($all_products, fn($p) => $p['name'] === $slide['product']))[0] ?? null;
+    ?>
+    <div class="hero-slide-left <?php echo $index === 0 ? 'active' : ''; ?>" data-slide="<?php echo $index; ?>"
+         <?php if ($product): ?>
+         data-id="<?php echo $product['id']; ?>" data-name="<?php echo htmlspecialchars($product['name']); ?>"
+         data-price="<?php echo $product['price']; ?>" data-img="<?php echo htmlspecialchars($product['image_url']); ?>"
+         <?php endif; ?>>
+      <h1 class="hero-title"><?php echo $slide['title']; ?></h1>
+      <p class="hero-sub"><?php echo $slide['sub']; ?></p>
       <div class="hero-cta-row">
         <a href="javascript:void(0)" class="btn-primary-dark add-to-cart">Order Now</a>
         <a href="#products" class="hero-link">All products &rarr;</a>
       </div>
     </div>
-
-    <!-- Slide 2 : Chukku Kaappi -->
-    <div class="hero-slide-left" data-slide="1" data-id="3" data-name="Chukku Kaappi" data-price="180" data-img="https://sevendaysenterprises.com/images/chukku-kaappi-packet.png">
-      <h1 class="hero-title">Warm your<br>soul with<br><em>Chukku Kaappi</em></h1>
-      <p class="hero-sub">Traditional dry-ginger coffee — rich, soothing and deeply aromatic. A comforting cup that nourishes from the inside out.</p>
-      <div class="hero-cta-row">
-        <a href="javascript:void(0)" class="btn-primary-dark add-to-cart">Order Now</a>
-        <a href="#products" class="hero-link">All products &rarr;</a>
-      </div>
-    </div>
-
-    <!-- Slide 3 : Millet Idli Powder -->
-    <div class="hero-slide-left" data-slide="2" data-id="1" data-name="Millet Idli Podi" data-price="150" data-img="https://sevendaysenterprises.com/images/millet-idli-powder-packet.png">
-      <h1 class="hero-title">Power your<br>mornings with<br><em>Millet Idli Podi</em></h1>
-      <p class="hero-sub">Nutritious millet flours meet bold aromatic spices — protein-rich, wholesome and utterly delicious with every crispy idli.</p>
-      <div class="hero-cta-row">
-        <a href="javascript:void(0)" class="btn-primary-dark add-to-cart">Order Now</a>
-        <a href="#products" class="hero-link">All products &rarr;</a>
-      </div>
-    </div>
+    <?php endforeach; ?>
 
     <!-- Dots -->
     <div class="hero-dots">
@@ -489,26 +490,15 @@
   <div class="hero-right">
     <div class="hero-progress" id="heroProgress"></div>
 
-    <!-- Photo 1 : Coconut Oil Kerala -->
-    <div class="hero-slide-right active" data-slide="0">
-      <img src="https://sevendaysenterprises.com/images/coconut-oil-kerala.png" alt="Kerala Coconut Oil" loading="eager"/>
-      <div class="slide-accent" style="background:var(--sage)"></div>
-      <div class="slide-label">Kerala Coconut Oil</div>
-    </div>
-
-    <!-- Photo 2 : Chukku Kaappi -->
-    <div class="hero-slide-right" data-slide="1">
-      <img src="https://sevendaysenterprises.com/images/chukku-kaapi.png" alt="Chukku Kaappi" loading="lazy"/>
-      <div class="slide-accent" style="background:#7b4a1e"></div>
-      <div class="slide-label">Chukku Kaappi</div>
-    </div>
-
-    <!-- Photo 3 : Millet Idli Powder -->
-    <div class="hero-slide-right" data-slide="2">
-      <img src="https://sevendaysenterprises.com/images/millet-idli-powder.png" alt="Millet Idli Podi" loading="lazy"/>
+    <?php foreach ($hero_slides as $index => $slide):
+        $product = array_values(array_filter($all_products, fn($p) => $p['name'] === $slide['product']))[0] ?? null;
+    ?>
+    <div class="hero-slide-right <?php echo $index === 0 ? 'active' : ''; ?>" data-slide="<?php echo $index; ?>">
+      <img src="<?php echo htmlspecialchars($product['image_url'] ?? ''); ?>" alt="<?php echo htmlspecialchars($slide['product']); ?>" loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>"/>
       <div class="slide-accent" style="background:var(--terra)"></div>
-      <div class="slide-label">Millet Idli Podi</div>
+      <div class="slide-label"><?php echo htmlspecialchars($slide['product']); ?></div>
     </div>
+    <?php endforeach; ?>
 
     <button class="hero-arrow hero-arrow-prev" id="heroPrev" aria-label="Previous slide"><i class="fa-solid fa-chevron-left"></i></button>
     <button class="hero-arrow hero-arrow-next" id="heroNext" aria-label="Next slide"><i class="fa-solid fa-chevron-right"></i></button>
@@ -521,22 +511,14 @@
 ════════════════════════════════════ -->
 <div class="marquee-strip">
   <div class="marquee-inner">
+    <?php for($i=0; $i<2; $i++): ?>
     <span class="marquee-item">Natural <span class="marquee-sep">✦</span></span>
     <span class="marquee-item">Secured <span class="marquee-sep">✦</span></span>
     <span class="marquee-item">Delicious <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Ginger Tea <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Millet Idli Podi <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Veppila Chammanthi Podi <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Chukku Kaappi <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Masala <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Natural <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Secured <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Delicious <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Ginger Tea <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Millet Idli Podi <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Veppila Chammanthi Podi <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Chukku Kaappi <span class="marquee-sep">✦</span></span>
-    <span class="marquee-item">Masala <span class="marquee-sep">✦</span></span>
+    <?php foreach($all_products as $p): ?>
+    <span class="marquee-item"><?php echo htmlspecialchars($p['name']); ?> <span class="marquee-sep">✦</span></span>
+    <?php endforeach; ?>
+    <?php endfor; ?>
   </div>
 </div>
 
@@ -564,7 +546,7 @@
             <div class="three-col-label">Natural<br>Ingredients</div>
           </div>
           <div class="three-col-item">
-            <div class="three-col-num">5+</div>
+            <div class="three-col-num"><?php echo count($all_products); ?>+</div>
             <div class="three-col-label">Signature<br>Products</div>
           </div>
           <div class="three-col-item">
@@ -595,157 +577,42 @@
       <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
         <div class="d-flex flex-wrap justify-content-lg-end gap-2" id="filterContainer">
           <button class="btn-nav active-filter" data-filter="all" style="padding: 0.4rem 1rem; font-size: 0.65rem;">All</button>
-          <button class="btn-nav" data-filter="Breakfast Companion" style="padding: 0.4rem 1rem; font-size: 0.65rem; background: transparent; color: var(--ink) !important; border: 1px solid var(--border);">Breakfast</button>
-          <button class="btn-nav" data-filter="Traditional Podi" style="padding: 0.4rem 1rem; font-size: 0.65rem; background: transparent; color: var(--ink) !important; border: 1px solid var(--border);">Podi</button>
-          <button class="btn-nav" data-filter="Herbal Drink" style="padding: 0.4rem 1rem; font-size: 0.65rem; background: transparent; color: var(--ink) !important; border: 1px solid var(--border);">Drinks</button>
-          <button class="btn-nav" data-filter="Traditional Oil" style="padding: 0.4rem 1rem; font-size: 0.65rem; background: transparent; color: var(--ink) !important; border: 1px solid var(--border);">Oil</button>
+          <?php
+          $display_cats = ['Breakfast Companion' => 'Breakfast', 'Traditional Podi' => 'Podi', 'Herbal Drink' => 'Drinks', 'Traditional Oil' => 'Oil'];
+          foreach ($display_cats as $full => $short):
+          ?>
+          <button class="btn-nav" data-filter="<?php echo $full; ?>" style="padding: 0.4rem 1rem; font-size: 0.65rem; background: transparent; color: var(--ink) !important; border: 1px solid var(--border);"><?php echo $short; ?></button>
+          <?php endforeach; ?>
         </div>
       </div>
     </div>
 
     <div class="prod-cards-grid">
-
-      <!-- Card 1 -->
-      <div class="prod-card" data-id="1" data-name="Millet Idli Podi" data-price="150" data-img="https://sevendaysenterprises.com/images/millet-idli-powder-packet.png" data-cat="Breakfast Companion" data-desc="Nutritious millet flours meet bold aromatic spices — protein-rich and wholesome. This traditional blend is perfect for those seeking a healthy, gluten-free addition to their morning meal.">
+      <?php foreach ($all_products as $product): ?>
+      <div class="prod-card" data-id="<?php echo $product['id']; ?>" data-name="<?php echo htmlspecialchars($product['name']); ?>"
+           data-price="<?php echo $product['price']; ?>" data-img="<?php echo htmlspecialchars($product['image_url']); ?>"
+           data-cat="<?php echo htmlspecialchars($product['category_name']); ?>" data-desc="<?php echo htmlspecialchars($product['description']); ?>">
         <div class="prod-card-img-wrap">
-          <img src="https://sevendaysenterprises.com/images/millet-idli-powder-packet.png" alt="Millet Idli Podi" loading="lazy"/>
+          <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" loading="lazy"/>
           <div class="prod-card-overlay">
             <a href="javascript:void(0)" class="prod-card-btn view-details me-2">View Details</a>
             <a href="javascript:void(0)" class="prod-card-btn add-to-cart">Add to Cart</a>
           </div>
+          <?php if ($product['is_star']): ?>
           <span class="prod-card-badge">Star Product</span>
+          <?php endif; ?>
         </div>
         <div class="prod-card-body">
-          <p class="prod-card-cat">Breakfast Companion</p>
-          <h3 class="prod-card-name">Millet Idli Podi</h3>
-          <p class="prod-card-desc">Nutritious millet flours meet bold aromatic spices — protein-rich and wholesome.</p>
+          <p class="prod-card-cat"><?php echo htmlspecialchars($product['category_name']); ?></p>
+          <h3 class="prod-card-name"><?php echo htmlspecialchars($product['name']); ?></h3>
+          <p class="prod-card-desc"><?php echo htmlspecialchars($product['description']); ?></p>
           <div class="d-flex justify-content-between align-items-center mt-3">
-            <span class="fw-bold">₹150</span>
+            <span class="fw-bold">₹<?php echo number_format($product['price'], 2); ?></span>
             <a href="javascript:void(0)" class="prod-arrow view-details">Details <i class="fa-solid fa-arrow-right ms-1"></i></a>
           </div>
         </div>
       </div>
-
-      <!-- Card 7 -->
-      <div class="prod-card" data-id="7" data-name="Kerala Coconut Oil" data-price="250" data-img="https://sevendaysenterprises.com/images/coconut-oil-kerala.png" data-cat="Traditional Oil" data-desc="Cold-pressed from the finest Kerala coconuts — rich in natural goodness, with a deep aroma that takes you straight to the source. Our coconut oil is unrefined and pure, maintaining all its natural nutrients and flavor.">
-        <div class="prod-card-img-wrap">
-          <img src="https://sevendaysenterprises.com/images/coconut-oil-kerala.png" alt="Kerala Coconut Oil" loading="lazy"/>
-          <div class="prod-card-overlay">
-            <a href="javascript:void(0)" class="prod-card-btn view-details me-2">View Details</a>
-            <a href="javascript:void(0)" class="prod-card-btn add-to-cart">Add to Cart</a>
-          </div>
-        </div>
-        <div class="prod-card-body">
-          <p class="prod-card-cat">Traditional Oil</p>
-          <h3 class="prod-card-name">Kerala Coconut Oil</h3>
-          <p class="prod-card-desc">Cold-pressed from the finest Kerala coconuts — rich in natural goodness.</p>
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <span class="fw-bold">₹250</span>
-            <a href="javascript:void(0)" class="prod-arrow view-details">Details <i class="fa-solid fa-arrow-right ms-1"></i></a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 2 -->
-      <div class="prod-card" data-id="2" data-name="Veppila Chammanthi Podi" data-price="120" data-img="https://sevendaysenterprises.com/images/veppila-chammmanthippodi.png" data-cat="Traditional Podi" data-desc="Curry leaves, roasted lentils and tangy tamarind — a taste of home in every spoonful. Our Veppila Chammanthi Podi is made using a time-honored recipe that captures the essence of Kerala's culinary heritage.">
-        <div class="prod-card-img-wrap">
-          <img src="https://sevendaysenterprises.com/images/veppila-chammmanthippodi.png" alt="Veppila Chammanthi Podi" loading="lazy"/>
-          <div class="prod-card-overlay">
-            <a href="javascript:void(0)" class="prod-card-btn view-details me-2">View Details</a>
-            <a href="javascript:void(0)" class="prod-card-btn add-to-cart">Add to Cart</a>
-          </div>
-        </div>
-        <div class="prod-card-body">
-          <p class="prod-card-cat">Traditional Podi</p>
-          <h3 class="prod-card-name">Veppila Chammanthi Podi</h3>
-          <p class="prod-card-desc">Curry leaves, roasted lentils and tangy tamarind — a taste of home in every spoonful.</p>
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <span class="fw-bold">₹120</span>
-            <a href="javascript:void(0)" class="prod-arrow view-details">Details <i class="fa-solid fa-arrow-right ms-1"></i></a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="prod-card" data-id="3" data-name="Chukku Kaappi" data-price="180" data-img="https://sevendaysenterprises.com/images/chukku-kaappi-packet.png" data-cat="Herbal Drink" data-desc="Traditional dry-ginger coffee — rich, soothing and deeply aromatic. This caffeine-free herbal brew is renowned for its health benefits, especially in aiding digestion and providing relief from cold and cough.">
-        <div class="prod-card-img-wrap">
-          <img src="https://sevendaysenterprises.com/images/chukku-kaappi-packet.png" alt="Chukku Kaappi" loading="lazy"/>
-          <div class="prod-card-overlay">
-            <a href="javascript:void(0)" class="prod-card-btn view-details me-2">View Details</a>
-            <a href="javascript:void(0)" class="prod-card-btn add-to-cart">Add to Cart</a>
-          </div>
-        </div>
-        <div class="prod-card-body">
-          <p class="prod-card-cat">Herbal Drink</p>
-          <h3 class="prod-card-name">Chukku Kaappi</h3>
-          <p class="prod-card-desc">Traditional dry-ginger coffee — rich, soothing and deeply aromatic.</p>
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <span class="fw-bold">₹180</span>
-            <a href="javascript:void(0)" class="prod-arrow view-details">Details <i class="fa-solid fa-arrow-right ms-1"></i></a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 4 -->
-      <div class="prod-card" data-id="4" data-name="Ginger Tea" data-price="140" data-img="https://sevendaysenterprises.com/images/ginger-tea-package.png" data-cat="Herbal Tea" data-desc="Hand-picked ginger and warming spices — every sip a gentle, natural awakening. Our Ginger Tea is crafted to provide a perfect balance of spice and comfort, making it an ideal companion for any time of the day.">
-        <div class="prod-card-img-wrap">
-          <img src="https://sevendaysenterprises.com/images/ginger-tea-package.png" alt="Ginger Tea" loading="lazy"/>
-          <div class="prod-card-overlay">
-            <a href="javascript:void(0)" class="prod-card-btn view-details me-2">View Details</a>
-            <a href="javascript:void(0)" class="prod-card-btn add-to-cart">Add to Cart</a>
-          </div>
-        </div>
-        <div class="prod-card-body">
-          <p class="prod-card-cat">Herbal Tea</p>
-          <h3 class="prod-card-name">Ginger Tea</h3>
-          <p class="prod-card-desc">Hand-picked ginger and warming spices — every sip a gentle, natural awakening.</p>
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <span class="fw-bold">₹140</span>
-            <a href="javascript:void(0)" class="prod-arrow view-details">Details <i class="fa-solid fa-arrow-right ms-1"></i></a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 5 -->
-      <div class="prod-card" data-id="5" data-name="Herbal Coffee" data-price="200" data-img="https://sevendaysenterprises.com/images/ragi-idli-powder-packet.png" data-cat="Caffeine Free" data-desc="Rich, roasty and full of antioxidants — the ritual without the jolt. Made from a selection of roasted grains and herbs, our Herbal Coffee offers a satisfying, full-bodied flavor that mimics traditional coffee without the caffeine.">
-        <div class="prod-card-img-wrap">
-          <img src="https://sevendaysenterprises.com/images/ragi-idli-powder-packet.png" alt="Herbal Coffee" loading="lazy"/>
-          <div class="prod-card-overlay">
-            <a href="javascript:void(0)" class="prod-card-btn view-details me-2">View Details</a>
-            <a href="javascript:void(0)" class="prod-card-btn add-to-cart">Add to Cart</a>
-          </div>
-        </div>
-        <div class="prod-card-body">
-          <p class="prod-card-cat">Caffeine Free</p>
-          <h3 class="prod-card-name">Herbal Coffee</h3>
-          <p class="prod-card-desc">Rich, roasty and full of antioxidants — the ritual without the jolt.</p>
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <span class="fw-bold">₹200</span>
-            <a href="javascript:void(0)" class="prod-arrow view-details">Details <i class="fa-solid fa-arrow-right ms-1"></i></a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 6 -->
-      <div class="prod-card" data-id="6" data-name="Signature Masala" data-price="90" data-img="https://sevendaysenterprises.com/images/signature-masala.png" data-cat="Spice Blend" data-desc="Freshly ground spices balanced to perfection — elevate every curry and marinade. Our Signature Masala is a versatile blend that adds a depth of flavor and authentic Kerala touch to all your dishes.">
-        <div class="prod-card-img-wrap">
-          <img src="https://sevendaysenterprises.com/images/signature-masala.png" alt="Signature Masala" loading="lazy"/>
-          <div class="prod-card-overlay">
-            <a href="javascript:void(0)" class="prod-card-btn view-details me-2">View Details</a>
-            <a href="javascript:void(0)" class="prod-card-btn add-to-cart">Add to Cart</a>
-          </div>
-        </div>
-        <div class="prod-card-body">
-          <p class="prod-card-cat">Spice Blend</p>
-          <h3 class="prod-card-name">Signature Masala</h3>
-          <p class="prod-card-desc">Freshly ground spices balanced to perfection — elevate every curry and marinade.</p>
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <span class="fw-bold">₹90</span>
-            <a href="javascript:void(0)" class="prod-arrow view-details">Details <i class="fa-solid fa-arrow-right ms-1"></i></a>
-          </div>
-        </div>
-      </div>
-
+      <?php endforeach; ?>
     </div>
   </div>
 </section>
@@ -761,35 +628,34 @@
       <div class="feat-main-overlay">
         <div class="feat-main-content">
           <span class="feat-tag">Our Star Product</span>
-          <h2 class="feat-main-title">Millet Idli Podi —<br><em>Nature's power<br>on your plate</em></h2>
-          <p class="feat-main-sub">Crafted from the finest millets and stone-ground spices straight from Kerala's heartland.</p>
-          <a href="#order" class="btn-terra">Order Now &nbsp;<i class="fa-solid fa-arrow-right"></i></a>
+          <?php if ($star_product): ?>
+          <h2 class="feat-main-title"><?php echo str_replace('Podi', 'Podi —<br><em>Nature\'s power<br>on your plate</em>', htmlspecialchars($star_product['name'])); ?></h2>
+          <p class="feat-main-sub"><?php echo htmlspecialchars($star_product['description']); ?></p>
+          <a href="javascript:void(0)" class="btn-terra add-to-cart"
+             data-id="<?php echo $star_product['id']; ?>" data-name="<?php echo htmlspecialchars($star_product['name']); ?>"
+             data-price="<?php echo $star_product['price']; ?>" data-img="<?php echo htmlspecialchars($star_product['image_url']); ?>">Order Now &nbsp;<i class="fa-solid fa-arrow-right"></i></a>
+          <?php endif; ?>
         </div>
       </div>
     </div>
     <div class="feat-stack">
-      <div class="feat-small" data-id="4" data-name="Ginger Tea" data-price="140" data-img="https://sevendaysenterprises.com/images/ginger-tea-package.png">
-        <img src="https://sevendaysenterprises.com/images/ginger-tea-package.png" alt="Ginger Tea" loading="lazy"/>
+      <?php foreach (array_slice($featured_products, 0, 2) as $feat): ?>
+      <div class="feat-small" data-id="<?php echo $feat['id']; ?>" data-name="<?php echo htmlspecialchars($feat['name']); ?>"
+           data-price="<?php echo $feat['price']; ?>" data-img="<?php echo htmlspecialchars($feat['image_url']); ?>">
+        <img src="<?php echo htmlspecialchars($feat['image_url']); ?>" alt="<?php echo htmlspecialchars($feat['name']); ?>" loading="lazy"/>
         <div class="feat-small-overlay">
-          <span class="feat-small-cat">Herbal Tea</span>
-          <h3 class="feat-small-name">Ginger Tea</h3>
+          <span class="feat-small-cat"><?php echo htmlspecialchars($feat['category_name']); ?></span>
+          <h3 class="feat-small-name"><?php echo htmlspecialchars($feat['name']); ?></h3>
           <a href="javascript:void(0)" class="feat-small-link add-to-cart">Add to Cart &rarr;</a>
         </div>
       </div>
-      <div class="feat-small" data-id="6" data-name="Signature Masala" data-price="90" data-img="https://sevendaysenterprises.com/images/signature-masala.png">
-        <img src="https://sevendaysenterprises.com/images/signature-masala.png" alt="Signature Masala" loading="lazy"/>
-        <div class="feat-small-overlay">
-          <span class="feat-small-cat">Spice Blend</span>
-          <h3 class="feat-small-name">Signature Masala</h3>
-          <a href="javascript:void(0)" class="feat-small-link add-to-cart">Add to Cart &rarr;</a>
-        </div>
-      </div>
+      <?php endforeach; ?>
     </div>
   </div>
   <div class="feat-stat-bar">
     <div class="feat-stat"><span class="feat-stat-num">100%</span><span class="feat-stat-label">Natural &amp; Pure</span></div>
     <div class="feat-stat-divider"></div>
-    <div class="feat-stat"><span class="feat-stat-num">6+</span><span class="feat-stat-label">Signature Products</span></div>
+    <div class="feat-stat"><span class="feat-stat-num"><?php echo count($all_products); ?>+</span><span class="feat-stat-label">Signature Products</span></div>
     <div class="feat-stat-divider"></div>
     <div class="feat-stat"><span class="feat-stat-num">0</span><span class="feat-stat-label">Artificial Additives</span></div>
     <div class="feat-stat-divider"></div>
@@ -935,12 +801,9 @@
       <div class="col-sm-6 col-lg-2">
         <p class="foot-head">Products</p>
         <ul class="foot-links">
-          <li><a href="#">Ginger Tea</a></li>
-          <li><a href="#">Veppila Podi</a></li>
-          <li><a href="#">Millet Idli Podi</a></li>
-          <li><a href="#">Chukku Kaappi</a></li>
-          <li><a href="#">Ragi Idli Podi</a></li>
-          <li><a href="#">Masala</a></li>
+          <?php foreach (array_slice($all_products, 0, 6) as $p): ?>
+          <li><a href="#products"><?php echo htmlspecialchars($p['name']); ?></a></li>
+          <?php endforeach; ?>
         </ul>
       </div>
       <div class="col-sm-6 col-lg-2">
@@ -1166,9 +1029,9 @@ window.addEventListener('scroll', function () {
   cartOverlay.addEventListener('click', closeCart);
   continueBtn.addEventListener('click', closeCart);
 
-  document.querySelectorAll('.add-to-cart').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      const card = this.closest('[data-id]');
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('add-to-cart')) {
+      const card = e.target.closest('[data-id]');
       if (card) {
         const product = {
           id: card.dataset.id,
@@ -1178,7 +1041,7 @@ window.addEventListener('scroll', function () {
         };
         addToCart(product);
       }
-    });
+    }
   });
 
   // Initial render
@@ -1187,7 +1050,8 @@ window.addEventListener('scroll', function () {
   /* ══════════════════════════════════════
      PRODUCT MODAL FUNCTIONALITY
   ══════════════════════════════════════ */
-  const productModal = new bootstrap.Modal(document.getElementById('productModal'));
+  const productModalElement = document.getElementById('productModal');
+  const productModal = productModalElement ? new bootstrap.Modal(productModalElement) : null;
   const modalImg = document.getElementById('modalImg');
   const modalCat = document.getElementById('modalCat');
   const modalName = document.getElementById('modalName');
@@ -1213,34 +1077,36 @@ window.addEventListener('scroll', function () {
     productModal.show();
   }
 
-  document.querySelectorAll('.view-details').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      const card = this.closest('[data-id]');
-      const product = {
-        id: card.dataset.id,
-        name: card.dataset.name,
-        price: parseFloat(card.dataset.price),
-        img: card.dataset.img,
-        cat: card.dataset.cat,
-        desc: card.dataset.desc
-      };
-      openProductModal(product);
-    });
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('view-details') || e.target.parentElement.classList.contains('view-details')) {
+      const card = e.target.closest('[data-id]');
+      if (card) {
+          const product = {
+            id: card.dataset.id,
+            name: card.dataset.name,
+            price: parseFloat(card.dataset.price),
+            img: card.dataset.img,
+            cat: card.dataset.cat,
+            desc: card.dataset.desc
+          };
+          openProductModal(product);
+      }
+    }
   });
 
-  document.getElementById('modalQtyDown').addEventListener('click', () => {
+  document.getElementById('modalQtyDown')?.addEventListener('click', () => {
     if (modalQty > 1) {
       modalQty--;
       modalQtyEl.textContent = modalQty;
     }
   });
 
-  document.getElementById('modalQtyUp').addEventListener('click', () => {
+  document.getElementById('modalQtyUp')?.addEventListener('click', () => {
     modalQty++;
     modalQtyEl.textContent = modalQty;
   });
 
-  modalAddToCartBtn.addEventListener('click', () => {
+  modalAddToCartBtn?.addEventListener('click', () => {
     if (currentModalProduct) {
       const existing = cart.find(item => item.id === currentModalProduct.id);
       if (existing) {
@@ -1257,13 +1123,14 @@ window.addEventListener('scroll', function () {
   /* ══════════════════════════════════════
      CHECKOUT FUNCTIONALITY
   ══════════════════════════════════════ */
-  const checkoutModal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+  const checkoutModalElement = document.getElementById('checkoutModal');
+  const checkoutModal = checkoutModalElement ? new bootstrap.Modal(checkoutModalElement) : null;
   const checkoutBtn = document.getElementById('checkoutBtn');
   const checkoutSummary = document.getElementById('checkoutSummary');
   const checkoutTotal = document.getElementById('checkoutTotal');
   const checkoutForm = document.getElementById('checkoutForm');
 
-  checkoutBtn.addEventListener('click', () => {
+  checkoutBtn?.addEventListener('click', () => {
     if (cart.length === 0) {
       alert("Your basket is empty!");
       return;
@@ -1285,35 +1152,38 @@ window.addEventListener('scroll', function () {
     checkoutModal.show();
   });
 
-  checkoutForm.addEventListener('submit', (e) => {
+  checkoutForm?.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const name = `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`;
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const address = document.getElementById('address').value;
+    const formData = {
+        first_name: document.getElementById('firstName').value,
+        last_name: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        cart: cart
+    };
 
-    let orderText = `*New Order from ${name}*\n\n`;
-    orderText += `*Items:*\n`;
-    let total = 0;
-    cart.forEach(item => {
-      orderText += `- ${item.name} x ${item.quantity}: ₹${(item.price * item.quantity).toFixed(2)}\n`;
-      total += item.price * item.quantity;
+    fetch('process_order.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("Thank you! Your order has been placed successfully.");
+            cart = [];
+            updateCart();
+            checkoutModal.hide();
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("There was an error placing your order.");
     });
-    orderText += `\n*Total:* ₹${total.toFixed(2)}\n\n`;
-    orderText += `*Shipping Details:*\n`;
-    orderText += `Email: ${email}\n`;
-    orderText += `Phone: ${phone}\n`;
-    orderText += `Address: ${address}`;
-
-    const whatsappUrl = `https://wa.me/91XXXXXXXXXX?text=${encodeURIComponent(orderText)}`;
-    window.open(whatsappUrl, '_blank');
-
-    // Clear cart
-    cart = [];
-    updateCart();
-    checkoutModal.hide();
-    alert("Thank you! Your order has been placed via WhatsApp.");
   });
 
   /* ══════════════════════════════════════
