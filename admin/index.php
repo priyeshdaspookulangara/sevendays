@@ -40,6 +40,7 @@ $recent_orders = $stmt->fetchAll();
         <a href="index.php" class="active"><i class="fa-solid fa-gauge me-2"></i> Dashboard</a>
         <a href="products.php"><i class="fa-solid fa-box me-2"></i> Products</a>
         <a href="orders.php"><i class="fa-solid fa-shopping-cart me-2"></i> Orders</a>
+        <a href="../index.php" target="_blank" class="mt-4"><i class="fa-solid fa-globe me-2"></i> View Site</a>
         <a href="logout.php" class="mt-5 text-danger"><i class="fa-solid fa-sign-out me-2"></i> Logout</a>
     </div>
 

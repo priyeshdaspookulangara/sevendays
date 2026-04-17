@@ -276,15 +276,8 @@ $featured_products = get_featured_products($pdo);
 
     .active-filter { background: var(--terra) !important; color: var(--white) !important; border-color: var(--terra) !important; }
 
-    /* ══ PRODUCT MODAL ══ */
-    .product-modal .modal-content { border-radius: 0; border: none; }
-    .product-modal .modal-body { padding: 0; }
-    .modal-product-img { width: 100%; height: 100%; object-fit: cover; background: var(--linen); }
-    .modal-product-info { padding: 3rem; }
-    @media (max-width: 767px) { .modal-product-info { padding: 1.5rem; } }
-    .modal-product-name { font-family: 'Fraunces', serif; font-weight: 700; font-size: 2rem; margin-bottom: 1rem; }
-    .modal-product-price { font-size: 1.5rem; color: var(--terra); font-weight: 500; margin-bottom: 1.5rem; }
-    .modal-product-desc { font-size: 1.05rem; line-height: 1.8; color: var(--stone); margin-bottom: 2rem; }
+    .fav-icon { position: absolute; top: 1rem; right: 1rem; z-index: 10; color: var(--pebble); cursor: pointer; transition: 0.3s; font-size: 1.2rem; }
+    .fav-icon.active { color: #e74c3c; }
 
     /* ══ CHECKOUT MODAL ══ */
     .checkout-modal .modal-content { border-radius: 0; border: none; }
@@ -304,11 +297,8 @@ $featured_products = get_featured_products($pdo);
 ════════════════════════════════════ -->
 <nav class="navbar navbar-expand-lg sticky-top" id="mainNav">
   <div class="container">
-    <a class="navbar-brand p-0" href="#">
-      <img src="https://sevendaysenterprises.com/wp-content/uploads/2024/10/cropped-logo-1.png"
-           alt="Sevendays Enterprises" class="navbar-logo"
-           onerror="this.style.display='none';document.getElementById('fallback-brand').style.display='block'"/>
-      <span id="fallback-brand" style="display:none;font-family:'Fraunces',serif;font-weight:700;font-size:1.3rem;color:var(--ink);">Sevendays</span>
+    <a class="navbar-brand p-0" href="index.php">
+      <span id="fallback-brand" style="font-family:'Fraunces',serif;font-weight:700;font-size:1.3rem;color:var(--ink);">Sevendays</span>
     </a>
     <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <i class="fa-solid fa-bars" style="color:var(--ink);font-size:1.1rem;"></i>
@@ -316,12 +306,17 @@ $featured_products = get_featured_products($pdo);
     <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
       <ul class="navbar-nav gap-1 mx-auto">
         <li class="nav-item"><a class="nav-link" href="#products">Products</a></li>
+        <li class="nav-item"><a class="nav-link" href="favorites.php">Favorites</a></li>
+        <li class="nav-item"><a class="nav-link" href="cart.php">Cart</a></li>
         <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-        <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
         <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
       </ul>
     </div>
     <div class="d-flex align-items-center">
+      <a href="favorites.php" class="me-3 position-relative">
+        <i class="fa-regular fa-heart" id="navFavIcon" style="color:var(--ink);font-size:1.2rem;"></i>
+        <span class="cart-badge d-none" id="favCount">0</span>
+      </a>
       <div class="nav-cart-btn me-3" id="cartToggle">
         <i class="fa-solid fa-cart-shopping" style="color:var(--ink);font-size:1.2rem;"></i>
         <span class="cart-badge" id="cartCount">0</span>
@@ -333,48 +328,6 @@ $featured_products = get_featured_products($pdo);
 
 <!-- CART SIDEBAR -->
 <div class="cart-overlay" id="cartOverlay"></div>
-<!-- PRODUCT MODAL -->
-<div class="modal fade product-modal" id="productModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body">
-        <button type="button" class="btn-close position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Close"></button>
-        <div class="row g-0">
-          <div class="col-lg-6">
-            <img src="" alt="" class="modal-product-img" id="modalImg">
-          </div>
-          <div class="col-lg-6">
-            <div class="modal-product-info">
-              <span class="tag-pill" id="modalCat">Category</span>
-              <h2 class="modal-product-name" id="modalName">Product Name</h2>
-              <div class="modal-product-price" id="modalPrice">₹ 0.00</div>
-              <p class="modal-product-desc" id="modalDesc">Product description goes here.</p>
-
-              <div class="d-flex gap-3 align-items-center mb-4">
-                <div class="d-flex align-items-center border" style="padding: 0.5rem 1rem;">
-                  <button class="qty-btn" id="modalQtyDown">-</button>
-                  <span class="mx-3" id="modalQty">1</span>
-                  <button class="qty-btn" id="modalQtyUp">+</button>
-                </div>
-                <button class="btn-terra flex-grow-1" id="modalAddToCart">Add to Cart</button>
-              </div>
-
-              <div class="pt-4 border-top">
-                <p class="small text-uppercase mb-2" style="letter-spacing: 0.1em; color: var(--pebble);">Product details</p>
-                <ul class="body-text small ps-3">
-                  <li>100% Organic & Natural</li>
-                  <li>No preservatives or artificial colors</li>
-                  <li>Directly sourced from Kerala farms</li>
-                  <li>Traditional processing methods</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- CHECKOUT MODAL -->
 <div class="modal fade checkout-modal" id="checkoutModal" tabindex="-1" aria-hidden="true">
@@ -441,8 +394,8 @@ $featured_products = get_featured_products($pdo);
       <span>Subtotal</span>
       <span id="cartTotal">₹ 0.00</span>
     </div>
-    <button class="btn-terra w-100 mb-2" id="checkoutBtn">Checkout</button>
-    <button class="btn-outline-dark w-100" id="continueShopping">Continue Shopping</button>
+    <a href="cart.php" class="btn-terra w-100 mb-2">View Full Cart</a>
+    <button class="btn-outline-dark w-100" id="checkoutBtnSidebar">Checkout Now</button>
   </div>
 </div>
 
@@ -466,8 +419,8 @@ $featured_products = get_featured_products($pdo);
     ?>
     <div class="hero-slide-left <?php echo $index === 0 ? 'active' : ''; ?>" data-slide="<?php echo $index; ?>"
          <?php if ($product): ?>
-         data-id="<?php echo $product['id']; ?>" data-name="<?php echo htmlspecialchars($product['name']); ?>"
-         data-price="<?php echo $product['price']; ?>" data-img="<?php echo htmlspecialchars($product['image_url']); ?>"
+         data-id="<?php echo $product['id']; ?>" data-name="<?php echo e($product['name']); ?>"
+         data-price="<?php echo $product['price']; ?>" data-img="<?php echo e($product['image_url']); ?>"
          <?php endif; ?>>
       <h1 class="hero-title"><?php echo $slide['title']; ?></h1>
       <p class="hero-sub"><?php echo $slide['sub']; ?></p>
@@ -494,9 +447,9 @@ $featured_products = get_featured_products($pdo);
         $product = array_values(array_filter($all_products, fn($p) => $p['name'] === $slide['product']))[0] ?? null;
     ?>
     <div class="hero-slide-right <?php echo $index === 0 ? 'active' : ''; ?>" data-slide="<?php echo $index; ?>">
-      <img src="<?php echo htmlspecialchars($product['image_url'] ?? ''); ?>" alt="<?php echo htmlspecialchars($slide['product']); ?>" loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>"/>
+      <img src="<?php echo e($product['image_url'] ?? ''); ?>" alt="<?php echo e($slide['product']); ?>" loading="<?php echo $index === 0 ? 'eager' : 'lazy'; ?>"/>
       <div class="slide-accent" style="background:var(--terra)"></div>
-      <div class="slide-label"><?php echo htmlspecialchars($slide['product']); ?></div>
+      <div class="slide-label"><?php echo e($slide['product']); ?></div>
     </div>
     <?php endforeach; ?>
 
@@ -516,7 +469,7 @@ $featured_products = get_featured_products($pdo);
     <span class="marquee-item">Secured <span class="marquee-sep">✦</span></span>
     <span class="marquee-item">Delicious <span class="marquee-sep">✦</span></span>
     <?php foreach($all_products as $p): ?>
-    <span class="marquee-item"><?php echo htmlspecialchars($p['name']); ?> <span class="marquee-sep">✦</span></span>
+    <span class="marquee-item"><?php echo e($p['name']); ?> <span class="marquee-sep">✦</span></span>
     <?php endforeach; ?>
     <?php endfor; ?>
   </div>
@@ -589,13 +542,16 @@ $featured_products = get_featured_products($pdo);
 
     <div class="prod-cards-grid">
       <?php foreach ($all_products as $product): ?>
-      <div class="prod-card" data-id="<?php echo $product['id']; ?>" data-name="<?php echo htmlspecialchars($product['name']); ?>"
-           data-price="<?php echo $product['price']; ?>" data-img="<?php echo htmlspecialchars($product['image_url']); ?>"
-           data-cat="<?php echo htmlspecialchars($product['category_name']); ?>" data-desc="<?php echo htmlspecialchars($product['description']); ?>">
+      <div class="prod-card" data-id="<?php echo $product['id']; ?>" data-name="<?php echo e($product['name']); ?>"
+           data-price="<?php echo $product['price']; ?>" data-img="<?php echo e($product['image_url']); ?>"
+           data-cat="<?php echo e($product['category_name']); ?>" data-desc="<?php echo e($product['description']); ?>">
         <div class="prod-card-img-wrap">
-          <img src="<?php echo htmlspecialchars($product['image_url']); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" loading="lazy"/>
+          <i class="fa-regular fa-heart fav-icon" data-id="<?php echo $product['id']; ?>"></i>
+          <a href="product.php?id=<?php echo $product['id']; ?>">
+            <img src="<?php echo e($product['image_url']); ?>" alt="<?php echo e($product['name']); ?>" loading="lazy"/>
+          </a>
           <div class="prod-card-overlay">
-            <a href="javascript:void(0)" class="prod-card-btn view-details me-2">View Details</a>
+            <a href="product.php?id=<?php echo $product['id']; ?>" class="prod-card-btn me-2">View Details</a>
             <a href="javascript:void(0)" class="prod-card-btn add-to-cart">Add to Cart</a>
           </div>
           <?php if ($product['is_star']): ?>
@@ -603,12 +559,12 @@ $featured_products = get_featured_products($pdo);
           <?php endif; ?>
         </div>
         <div class="prod-card-body">
-          <p class="prod-card-cat"><?php echo htmlspecialchars($product['category_name']); ?></p>
-          <h3 class="prod-card-name"><?php echo htmlspecialchars($product['name']); ?></h3>
-          <p class="prod-card-desc"><?php echo htmlspecialchars($product['description']); ?></p>
+          <p class="prod-card-cat"><?php echo e($product['category_name']); ?></p>
+          <h3 class="prod-card-name"><a href="product.php?id=<?php echo $product['id']; ?>" class="text-decoration-none text-dark"><?php echo e($product['name']); ?></a></h3>
+          <p class="prod-card-desc"><?php echo e($product['description']); ?></p>
           <div class="d-flex justify-content-between align-items-center mt-3">
             <span class="fw-bold">₹<?php echo number_format($product['price'], 2); ?></span>
-            <a href="javascript:void(0)" class="prod-arrow view-details">Details <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            <a href="product.php?id=<?php echo $product['id']; ?>" class="prod-arrow">Details <i class="fa-solid fa-arrow-right ms-1"></i></a>
           </div>
         </div>
       </div>
@@ -629,23 +585,23 @@ $featured_products = get_featured_products($pdo);
         <div class="feat-main-content">
           <span class="feat-tag">Our Star Product</span>
           <?php if ($star_product): ?>
-          <h2 class="feat-main-title"><?php echo str_replace('Podi', 'Podi —<br><em>Nature\'s power<br>on your plate</em>', htmlspecialchars($star_product['name'])); ?></h2>
-          <p class="feat-main-sub"><?php echo htmlspecialchars($star_product['description']); ?></p>
+          <h2 class="feat-main-title"><?php echo str_replace('Podi', 'Podi —<br><em>Nature\'s power<br>on your plate</em>', e($star_product['name'])); ?></h2>
+          <p class="feat-main-sub"><?php echo e($star_product['description']); ?></p>
           <a href="javascript:void(0)" class="btn-terra add-to-cart"
-             data-id="<?php echo $star_product['id']; ?>" data-name="<?php echo htmlspecialchars($star_product['name']); ?>"
-             data-price="<?php echo $star_product['price']; ?>" data-img="<?php echo htmlspecialchars($star_product['image_url']); ?>">Order Now &nbsp;<i class="fa-solid fa-arrow-right"></i></a>
+             data-id="<?php echo $star_product['id']; ?>" data-name="<?php echo e($star_product['name']); ?>"
+             data-price="<?php echo $star_product['price']; ?>" data-img="<?php echo e($star_product['image_url']); ?>">Order Now &nbsp;<i class="fa-solid fa-arrow-right"></i></a>
           <?php endif; ?>
         </div>
       </div>
     </div>
     <div class="feat-stack">
       <?php foreach (array_slice($featured_products, 0, 2) as $feat): ?>
-      <div class="feat-small" data-id="<?php echo $feat['id']; ?>" data-name="<?php echo htmlspecialchars($feat['name']); ?>"
-           data-price="<?php echo $feat['price']; ?>" data-img="<?php echo htmlspecialchars($feat['image_url']); ?>">
-        <img src="<?php echo htmlspecialchars($feat['image_url']); ?>" alt="<?php echo htmlspecialchars($feat['name']); ?>" loading="lazy"/>
+      <div class="feat-small" data-id="<?php echo $feat['id']; ?>" data-name="<?php echo e($feat['name']); ?>"
+           data-price="<?php echo $feat['price']; ?>" data-img="<?php echo e($feat['image_url']); ?>">
+        <img src="<?php echo e($feat['image_url']); ?>" alt="<?php echo e($feat['name']); ?>" loading="lazy"/>
         <div class="feat-small-overlay">
-          <span class="feat-small-cat"><?php echo htmlspecialchars($feat['category_name']); ?></span>
-          <h3 class="feat-small-name"><?php echo htmlspecialchars($feat['name']); ?></h3>
+          <span class="feat-small-cat"><?php echo e($feat['category_name']); ?></span>
+          <h3 class="feat-small-name"><?php echo e($feat['name']); ?></h3>
           <a href="javascript:void(0)" class="feat-small-link add-to-cart">Add to Cart &rarr;</a>
         </div>
       </div>
@@ -802,15 +758,15 @@ $featured_products = get_featured_products($pdo);
         <p class="foot-head">Products</p>
         <ul class="foot-links">
           <?php foreach (array_slice($all_products, 0, 6) as $p): ?>
-          <li><a href="#products"><?php echo htmlspecialchars($p['name']); ?></a></li>
+          <li><a href="product.php?id=<?php echo $p['id']; ?>"><?php echo e($p['name']); ?></a></li>
           <?php endforeach; ?>
         </ul>
       </div>
       <div class="col-sm-6 col-lg-2">
         <p class="foot-head">Company</p>
         <ul class="foot-links">
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Our Story</a></li>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#about">Our Story</a></li>
           <li><a href="#">Blog</a></li>
           <li><a href="#">Wholesale</a></li>
         </ul>
@@ -932,10 +888,11 @@ window.addEventListener('scroll', function () {
 })();
 
 /* ══════════════════════════════════════
-   CART FUNCTIONALITY
+   CART & FAVS FUNCTIONALITY
 ══════════════════════════════════════ */
 (function() {
   let cart = JSON.parse(localStorage.getItem('sevendays_cart')) || [];
+  let favs = JSON.parse(localStorage.getItem('sevendays_favs')) || [];
 
   const cartSidebar = document.getElementById('cartSidebar');
   const cartOverlay = document.getElementById('cartOverlay');
@@ -944,28 +901,54 @@ window.addEventListener('scroll', function () {
   const cartItemsContainer = document.getElementById('cartItems');
   const cartTotalElement = document.getElementById('cartTotal');
   const cartCountElement = document.getElementById('cartCount');
-  const continueBtn = document.getElementById('continueShopping');
+  const favCountElement = document.getElementById('favCount');
+  const navFavIcon = document.getElementById('navFavIcon');
 
   function updateCart() {
     localStorage.setItem('sevendays_cart', JSON.stringify(cart));
     renderCart();
   }
 
+  function updateFavs() {
+    localStorage.setItem('sevendays_favs', JSON.stringify(favs));
+    favCountElement.textContent = favs.length;
+    favCountElement.classList.toggle('d-none', favs.length === 0);
+
+    if (favs.length > 0) {
+        navFavIcon?.classList.remove('fa-regular');
+        navFavIcon?.classList.add('fa-solid');
+    } else {
+        navFavIcon?.classList.add('fa-regular');
+        navFavIcon?.classList.remove('fa-solid');
+    }
+
+    document.querySelectorAll('.fav-icon').forEach(icon => {
+        const id = icon.dataset.id;
+        if (favs.includes(id)) {
+            icon.classList.add('active', 'fa-solid');
+            icon.classList.remove('fa-regular');
+        } else {
+            icon.classList.remove('active', 'fa-solid');
+            icon.classList.add('fa-regular');
+        }
+    });
+  }
+
   function renderCart() {
+    let count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCountElement.textContent = count;
+
     if (cart.length === 0) {
       cartItemsContainer.innerHTML = '<div class="cart-empty">Your basket is currently empty.</div>';
       cartTotalElement.textContent = '₹ 0.00';
-      cartCountElement.textContent = '0';
       return;
     }
 
     let total = 0;
-    let count = 0;
     cartItemsContainer.innerHTML = '';
 
     cart.forEach((item, index) => {
       total += item.price * item.quantity;
-      count += item.quantity;
 
       const itemEl = document.createElement('div');
       itemEl.className = 'cart-item';
@@ -986,7 +969,6 @@ window.addEventListener('scroll', function () {
     });
 
     cartTotalElement.textContent = `₹ ${total.toFixed(2)}`;
-    cartCountElement.textContent = count;
   }
 
   window.changeQty = function(index, delta) {
@@ -1024,10 +1006,9 @@ window.addEventListener('scroll', function () {
   }
 
   // Event Listeners
-  cartToggle.addEventListener('click', openCart);
-  cartClose.addEventListener('click', closeCart);
-  cartOverlay.addEventListener('click', closeCart);
-  continueBtn.addEventListener('click', closeCart);
+  cartToggle?.addEventListener('click', openCart);
+  cartClose?.addEventListener('click', closeCart);
+  cartOverlay?.addEventListener('click', closeCart);
 
   document.addEventListener('click', function(e) {
     if (e.target.classList.contains('add-to-cart')) {
@@ -1042,95 +1023,30 @@ window.addEventListener('scroll', function () {
         addToCart(product);
       }
     }
+
+    if (e.target.classList.contains('fav-icon')) {
+        const id = e.target.dataset.id;
+        const index = favs.indexOf(id);
+        if (index > -1) favs.splice(index, 1);
+        else favs.push(id);
+        updateFavs();
+    }
   });
 
-  // Initial render
   renderCart();
-
-  /* ══════════════════════════════════════
-     PRODUCT MODAL FUNCTIONALITY
-  ══════════════════════════════════════ */
-  const productModalElement = document.getElementById('productModal');
-  const productModal = productModalElement ? new bootstrap.Modal(productModalElement) : null;
-  const modalImg = document.getElementById('modalImg');
-  const modalCat = document.getElementById('modalCat');
-  const modalName = document.getElementById('modalName');
-  const modalPrice = document.getElementById('modalPrice');
-  const modalDesc = document.getElementById('modalDesc');
-  const modalQtyEl = document.getElementById('modalQty');
-  const modalAddToCartBtn = document.getElementById('modalAddToCart');
-  let currentModalProduct = null;
-  let modalQty = 1;
-
-  function openProductModal(product) {
-    currentModalProduct = product;
-    modalQty = 1;
-    modalQtyEl.textContent = modalQty;
-
-    modalImg.src = product.img;
-    modalImg.alt = product.name;
-    modalCat.textContent = product.cat;
-    modalName.textContent = product.name;
-    modalPrice.textContent = `₹ ${product.price.toFixed(2)}`;
-    modalDesc.textContent = product.desc;
-
-    productModal.show();
-  }
-
-  document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('view-details') || e.target.parentElement.classList.contains('view-details')) {
-      const card = e.target.closest('[data-id]');
-      if (card) {
-          const product = {
-            id: card.dataset.id,
-            name: card.dataset.name,
-            price: parseFloat(card.dataset.price),
-            img: card.dataset.img,
-            cat: card.dataset.cat,
-            desc: card.dataset.desc
-          };
-          openProductModal(product);
-      }
-    }
-  });
-
-  document.getElementById('modalQtyDown')?.addEventListener('click', () => {
-    if (modalQty > 1) {
-      modalQty--;
-      modalQtyEl.textContent = modalQty;
-    }
-  });
-
-  document.getElementById('modalQtyUp')?.addEventListener('click', () => {
-    modalQty++;
-    modalQtyEl.textContent = modalQty;
-  });
-
-  modalAddToCartBtn?.addEventListener('click', () => {
-    if (currentModalProduct) {
-      const existing = cart.find(item => item.id === currentModalProduct.id);
-      if (existing) {
-        existing.quantity += modalQty;
-      } else {
-        cart.push({...currentModalProduct, quantity: modalQty});
-      }
-      updateCart();
-      productModal.hide();
-      openCart();
-    }
-  });
+  updateFavs();
 
   /* ══════════════════════════════════════
      CHECKOUT FUNCTIONALITY
   ══════════════════════════════════════ */
   const checkoutModalElement = document.getElementById('checkoutModal');
   const checkoutModal = checkoutModalElement ? new bootstrap.Modal(checkoutModalElement) : null;
-  const checkoutBtn = document.getElementById('checkoutBtn');
+  const checkoutBtnSidebar = document.getElementById('checkoutBtnSidebar');
   const checkoutSummary = document.getElementById('checkoutSummary');
   const checkoutTotal = document.getElementById('checkoutTotal');
   const checkoutForm = document.getElementById('checkoutForm');
 
-  checkoutBtn?.addEventListener('click', () => {
+  checkoutBtnSidebar?.addEventListener('click', () => {
     if (cart.length === 0) {
       alert("Your basket is empty!");
       return;
@@ -1173,16 +1089,13 @@ window.addEventListener('scroll', function () {
     .then(data => {
         if (data.success) {
             alert("Thank you! Your order has been placed successfully.");
+            localStorage.removeItem('sevendays_cart');
             cart = [];
-            updateCart();
+            renderCart();
             checkoutModal.hide();
         } else {
             alert("Error: " + data.message);
         }
-    })
-    .catch(err => {
-        console.error(err);
-        alert("There was an error placing your order.");
     });
   });
 
@@ -1194,7 +1107,6 @@ window.addEventListener('scroll', function () {
 
   filterButtons.forEach(btn => {
     btn.addEventListener('click', function() {
-      // Update UI
       filterButtons.forEach(b => {
         b.classList.remove('active-filter');
         b.style.background = 'transparent';
@@ -1202,7 +1114,7 @@ window.addEventListener('scroll', function () {
         b.style.borderColor = 'var(--border)';
       });
       this.classList.add('active-filter');
-      this.style.background = ''; // reset to default active style
+      this.style.background = '';
       this.style.color = '';
       this.style.borderColor = '';
 

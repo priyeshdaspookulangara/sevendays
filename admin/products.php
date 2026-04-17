@@ -111,7 +111,7 @@ $products = get_all_products($pdo);
                             <td><?php echo $product['is_featured'] ? 'Yes' : 'No'; ?></td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-info" onclick='editProduct(<?php echo json_encode($product); ?>)'>Edit</button>
+                                    <button class="btn btn-sm btn-info" onclick='editProduct(<?php echo htmlspecialchars(json_encode($product), ENT_QUOTES, "UTF-8"); ?>)'>Edit</button>
                                     <form method="POST" onsubmit="return confirm('Are you sure?')">
                                         <input type="hidden" name="id" value="<?php echo $product['id']; ?>">
                                         <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">

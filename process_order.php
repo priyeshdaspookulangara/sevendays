@@ -12,8 +12,19 @@ if (!$data) {
 try {
     $pdo->beginTransaction();
 
+    // Fetch actual prices from DB to prevent price manipulation
+    $product_ids = array_column($data['cart'], 'id');
+    $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
+    $stmt = $pdo->prepare("SELECT id, price FROM products WHERE id IN ($placeholders)");
+    $stmt->execute($product_ids);
+    $db_prices = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
     $total = 0;
-    foreach ($data['cart'] as $item) {
+    foreach ($data['cart'] as &$item) {
+        if (!isset($db_prices[$item['id']])) {
+            throw new Exception("Product not found: " . $item['id']);
+        }
+        $item['price'] = $db_prices[$item['id']];
         $total += $item['price'] * $item['quantity'];
     }
 
