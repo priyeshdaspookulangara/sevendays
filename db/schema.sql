@@ -1,50 +1,62 @@
+-- MySQL Schema for Sevendays Enterprises
+
 CREATE TABLE IF NOT EXISTS categories (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE
-);
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE
+) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS products (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    category_id INTEGER,
-    name TEXT NOT NULL,
-    price REAL NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    category_id INT,
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
     description TEXT,
-    image_url TEXT,
-    is_featured INTEGER DEFAULT 0,
-    is_star INTEGER DEFAULT 0,
-    FOREIGN KEY (category_id) REFERENCES categories(id)
-);
+    image_url VARCHAR(255),
+    is_featured TINYINT(1) DEFAULT 0,
+    is_star TINYINT(1) DEFAULT 0,
+    INDEX (category_id),
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS orders (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
-    email TEXT NOT NULL,
-    phone TEXT NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
     address TEXT NOT NULL,
-    total_amount REAL NOT NULL,
-    status TEXT DEFAULT 'Pending',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+    total_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(50) DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS order_items (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_id INTEGER,
-    product_id INTEGER,
-    quantity INTEGER NOT NULL,
-    price REAL NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id),
-    FOREIGN KEY (product_id) REFERENCES products(id)
-);
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    INDEX (order_id),
+    INDEX (product_id),
+    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS admins (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL
-);
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+) ENGINE=InnoDB;
 
 -- Initial Categories
-INSERT OR IGNORE INTO categories (name) VALUES ('Breakfast Companion'), ('Traditional Podi'), ('Herbal Drink'), ('Herbal Tea'), ('Caffeine Free'), ('Spice Blend'), ('Traditional Oil');
+INSERT IGNORE INTO categories (name) VALUES
+('Breakfast Companion'),
+('Traditional Podi'),
+('Herbal Drink'),
+('Herbal Tea'),
+('Caffeine Free'),
+('Spice Blend'),
+('Traditional Oil');
 
 -- Initial Products
 INSERT INTO products (category_id, name, price, description, image_url, is_star)
@@ -75,5 +87,5 @@ INSERT INTO products (category_id, name, price, description, image_url)
 SELECT id, 'Kerala Coconut Oil', 250.00, 'Cold-pressed from the finest Kerala coconuts — rich in natural goodness.', 'https://sevendaysenterprises.com/images/coconut-oil-kerala.png'
 FROM categories WHERE name = 'Traditional Oil';
 
--- Default Admin: admin / admin123 (hashed using PASSWORD_DEFAULT)
-INSERT OR IGNORE INTO admins (username, password) VALUES ('admin', '$2y$10$8W3Y6uO4vWdDqj.p8/E3U.W9jXWqZqF6m7XzG6j8r9/x.V.w5p5u.');
+-- Default Admin: admin / admin123
+INSERT IGNORE INTO admins (username, password) VALUES ('admin', '$2y$10$8W3Y6uO4vWdDqj.p8/E3U.W9jXWqZqF6m7XzG6j8r9/x.V.w5p5u.');

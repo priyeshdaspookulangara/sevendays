@@ -1,14 +1,27 @@
 <?php
-$db_path = __DIR__ . '/../db/ecommerce.db';
+// MySQL Database Configuration
+$host = 'localhost';
+$db   = 'ecommerce';
+$user = 'root';
+$pass = ''; // Default password is often empty in local environments
+$charset = 'utf8mb4';
+
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
 
 try {
-    $pdo = new PDO("sqlite:" . $db_path);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+     $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (\PDOException $e) {
+     // If the database doesn't exist, we might want to handle it or just fail
+     // For this task, we assume the user has set up the database.
+     die("Database connection failed. Please ensure MySQL is running and the 'ecommerce' database exists with the correct credentials.\nError: " . $e->getMessage());
 }
 
+// Common functions
 function get_all_products($pdo) {
     $stmt = $pdo->query("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id");
     return $stmt->fetchAll();
@@ -30,7 +43,7 @@ function get_star_product($pdo) {
 }
 
 function e($string) {
-    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars($string ?? '', ENT_QUOTES, 'UTF-8');
 }
 
 function generate_csrf_token() {
