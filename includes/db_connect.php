@@ -16,30 +16,53 @@ $options = [
 try {
      $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-     // If the database doesn't exist, we might want to handle it or just fail
-     // For this task, we assume the user has set up the database.
-     die("Database connection failed. Please ensure MySQL is running and the 'ecommerce' database exists with the correct credentials.\nError: " . $e->getMessage());
+     // Log the error for the administrator
+     error_log("Database connection failed: " . $e->getMessage());
+
+     // Return a clean error message to the user
+     http_response_code(500);
+     die("The website is currently experiencing technical difficulties. Please try again later.");
 }
 
 // Common functions
 function get_all_products($pdo) {
-    $stmt = $pdo->query("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id");
-    return $stmt->fetchAll();
+    try {
+        $stmt = $pdo->query("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id");
+        return $stmt->fetchAll();
+    } catch (\PDOException $e) {
+        error_log("Error fetching products: " . $e->getMessage());
+        return [];
+    }
 }
 
 function get_categories($pdo) {
-    $stmt = $pdo->query("SELECT * FROM categories");
-    return $stmt->fetchAll();
+    try {
+        $stmt = $pdo->query("SELECT * FROM categories");
+        return $stmt->fetchAll();
+    } catch (\PDOException $e) {
+        error_log("Error fetching categories: " . $e->getMessage());
+        return [];
+    }
 }
 
 function get_featured_products($pdo) {
-    $stmt = $pdo->query("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.is_featured = 1");
-    return $stmt->fetchAll();
+    try {
+        $stmt = $pdo->query("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.is_featured = 1");
+        return $stmt->fetchAll();
+    } catch (\PDOException $e) {
+        error_log("Error fetching featured products: " . $e->getMessage());
+        return [];
+    }
 }
 
 function get_star_product($pdo) {
-    $stmt = $pdo->query("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.is_star = 1 LIMIT 1");
-    return $stmt->fetch();
+    try {
+        $stmt = $pdo->query("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.is_star = 1 LIMIT 1");
+        return $stmt->fetch();
+    } catch (\PDOException $e) {
+        error_log("Error fetching star product: " . $e->getMessage());
+        return null;
+    }
 }
 
 function e($string) {
@@ -47,6 +70,9 @@ function e($string) {
 }
 
 function generate_csrf_token() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
@@ -54,6 +80,9 @@ function generate_csrf_token() {
 }
 
 function verify_csrf_token($token) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
 ?>

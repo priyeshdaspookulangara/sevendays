@@ -10,10 +10,18 @@ if (!$data) {
 }
 
 try {
+    if (empty($data['cart'])) {
+        throw new Exception("Your basket is empty");
+    }
+
     $pdo->beginTransaction();
 
     // Fetch actual prices from DB to prevent price manipulation
     $product_ids = array_column($data['cart'], 'id');
+    if (empty($product_ids)) {
+        throw new Exception("Invalid cart items");
+    }
+
     $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
     $stmt = $pdo->prepare("SELECT id, price FROM products WHERE id IN ($placeholders)");
     $stmt->execute($product_ids);
