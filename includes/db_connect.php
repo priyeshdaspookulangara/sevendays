@@ -1,12 +1,38 @@
 <?php
-// MySQL Database Configuration
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// MySQL Database Configuration defaults
 $host = 'localhost';
+$port = '3306';
 $db   = 'ecommerce';
 $user = 'root';
 $pass = ''; // Default password is often empty in local environments
 $charset = 'utf8mb4';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+// Check for DATABASE_URL or other standard DB URLs (Heroku, Render, JawsDB, ClearDB, etc.)
+$db_url = getenv('DATABASE_URL') ?: getenv('JAWSDB_URL') ?: getenv('CLEARDB_DATABASE_URL');
+if ($db_url) {
+    $parsed_url = parse_url($db_url);
+    if ($parsed_url) {
+        $host = $parsed_url['host'] ?? $host;
+        $port = $parsed_url['port'] ?? $port;
+        $user = $parsed_url['user'] ?? $user;
+        $pass = $parsed_url['pass'] ?? $pass;
+        $db   = isset($parsed_url['path']) ? ltrim($parsed_url['path'], '/') : $db;
+    }
+} else {
+    // Check for individual environment variables
+    $host = getenv('DB_HOST') ?: $host;
+    $port = getenv('DB_PORT') ?: $port;
+    $db   = getenv('DB_NAME') ?: getenv('DB_DATABASE') ?: $db;
+    $user = getenv('DB_USER') ?: getenv('DB_USERNAME') ?: $user;
+    $pass = getenv('DB_PASS') !== false ? getenv('DB_PASS') : (getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : $pass);
+}
+
+$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -16,9 +42,9 @@ $options = [
 try {
      $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-     // If the database doesn't exist, we might want to handle it or just fail
-     // For this task, we assume the user has set up the database.
-     die("Database connection failed. Please ensure MySQL is running and the 'ecommerce' database exists with the correct credentials.\nError: " . $e->getMessage());
+     // If the database connection fails, set 500 HTTP response code and show a clean message
+     http_response_code(500);
+     die("Database connection failed. Please ensure MySQL is running and the database exists with the correct credentials.\nError: " . $e->getMessage());
 }
 
 // Common functions

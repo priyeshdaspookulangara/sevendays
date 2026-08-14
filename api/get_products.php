@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../includes/db_connect.php';
 
 $ids_str = $_GET['ids'] ?? '';
-if (empty($ids_str)) {
+if (!is_string($ids_str) || empty($ids_str)) {
     echo json_encode([]);
     exit;
 }

@@ -27,10 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
     if (!verify_csrf_token($_POST['csrf_token'])) {
         die("CSRF token validation failed");
     }
-    $id = $_POST['id'] ?? '';
+    $id = !empty($_POST['id']) && is_scalar($_POST['id']) ? (int)$_POST['id'] : null;
     $name = $_POST['name'] ?? '';
-    $price = $_POST['price'] ?? '';
-    $category_id = $_POST['category_id'] ?? '';
+    $price = !empty($_POST['price']) && is_scalar($_POST['price']) ? (float)$_POST['price'] : 0.00;
+    $category_id = !empty($_POST['category_id']) && is_scalar($_POST['category_id']) ? (int)$_POST['category_id'] : null;
     $description = $_POST['description'] ?? '';
     $image_url = $_POST['image_url'] ?? '';
     $is_featured = isset($_POST['is_featured']) ? 1 : 0;

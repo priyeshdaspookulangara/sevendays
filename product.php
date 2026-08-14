@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/db_connect.php';
 
-$id = $_GET['id'] ?? 0;
+$id = isset($_GET['id']) && is_scalar($_GET['id']) ? (int)$_GET['id'] : 0;
 
 $stmt = $pdo->prepare("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.id = ?");
 $stmt->execute([$id]);

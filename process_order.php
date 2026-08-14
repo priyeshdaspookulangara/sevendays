@@ -4,8 +4,21 @@ require_once __DIR__ . '/includes/db_connect.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-if (!$data) {
+if (!$data || !is_array($data)) {
     echo json_encode(['success' => false, 'message' => 'Invalid data']);
+    exit;
+}
+
+// Ensure required fields and cart are set
+$data['first_name'] = $data['first_name'] ?? '';
+$data['last_name'] = $data['last_name'] ?? '';
+$data['email'] = $data['email'] ?? '';
+$data['phone'] = $data['phone'] ?? '';
+$data['address'] = $data['address'] ?? '';
+$data['cart'] = $data['cart'] ?? [];
+
+if (!is_array($data['cart'])) {
+    echo json_encode(['success' => false, 'message' => 'Cart must be an array']);
     exit;
 }
 
