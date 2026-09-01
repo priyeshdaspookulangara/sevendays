@@ -705,7 +705,7 @@ $featured_products = get_featured_products($pdo);
       <h2 class="cta-title">Bring nature's goodness<br>into your <em>home today</em></h2>
       <p class="cta-sub">Order fresh. Delivered with care. Straight to your door — because you deserve the best that nature has to offer.</p>
       <div class="d-flex justify-content-center gap-3 flex-wrap">
-        <a href="tel:+91XXXXXXXXXX" class="btn-terra"><i class="fa-solid fa-phone me-2"></i>Call to Order</a>
+        <a href="tel:+918281474922" class="btn-terra"><i class="fa-solid fa-phone me-2"></i>Call to Order</a>
         <a href="mailto:contact@sevendaysenterprises.com" class="btn-outline-dark"><i class="fa-solid fa-envelope me-2"></i>Email Us</a>
       </div>
     </div>
@@ -773,8 +773,8 @@ $featured_products = get_featured_products($pdo);
       </div>
       <div class="col-lg-4">
         <p class="foot-head">Get in Touch</p>
-        <div class="foot-contact-item"><i class="fa-solid fa-location-dot"></i><span>Kerala, India</span></div>
-        <div class="foot-contact-item"><i class="fa-solid fa-phone"></i><a href="tel:+91XXXXXXXXXX">+91 XXXXX XXXXX</a></div>
+        <div class="foot-contact-item"><i class="fa-solid fa-location-dot"></i><span>Sevendays Enterprises<br>Erakkath complex<br>N. Paravur, Ernakulam, Kerala - 683 513</span></div>
+        <div class="foot-contact-item"><i class="fa-solid fa-phone"></i><a href="tel:+918281474922">Customer care: 8281 47 4922</a></div>
         <div class="foot-contact-item"><i class="fa-solid fa-envelope"></i><a href="mailto:contact@sevendaysenterprises.com">contact@sevendaysenterprises.com</a></div>
         <div class="foot-contact-item"><i class="fa-solid fa-globe"></i><a href="https://sevendaysenterprises.com" target="_blank">sevendaysenterprises.com</a></div>
       </div>
